@@ -37,15 +37,11 @@ const CONTAINER_MOTION_PROPS = {
 
 const MESSAGE_MOTION_PROPS = {
   variants: {
-    hidden: {
-      opacity: 0,
-      translateY: 10,
-    },
-    visible: {
-      opacity: 1,
-      translateY: 0,
-    },
+    hidden: { opacity: 0, translateY: 10 },
+    visible: { opacity: 1, translateY: 0 },
   },
+  initial: 'hidden',
+  animate: 'visible',
 };
 
 interface ChatTranscriptProps {

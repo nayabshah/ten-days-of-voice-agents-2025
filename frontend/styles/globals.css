@@ -159,3 +159,117 @@
     }
   }
 }
+
+/* Barista client styles (append/merge into your app/globals.css) */
+.barista-root {
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    Arial;
+  display: flex;
+  justify-content: center;
+  padding: 12px;
+}
+
+.barista-panel {
+  width: 100%;
+  max-width: 900px;
+  border: 1px solid #e3e6ea;
+  border-radius: 8px;
+  padding: 14px;
+  background: #fff;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.controls button {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #d0d7de;
+  background: #f6f8fa;
+  cursor: pointer;
+}
+
+.remote-audio-container {
+  display: none; /* remote audio elements are attached and play, but not visible */
+}
+
+.transcript {
+  margin-top: 12px;
+}
+
+.transcript-header {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.messages {
+  max-height: 320px;
+  overflow-y: auto;
+  border: 1px solid #eef2f6;
+  padding: 8px;
+  border-radius: 6px;
+  background: #fafbfc;
+}
+
+.msg {
+  padding: 6px 8px;
+  margin-bottom: 6px;
+  border-radius: 6px;
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.msg-role {
+  font-weight: 700;
+  font-size: 12px;
+  min-width: 70px;
+  color: #333;
+}
+
+.msg-text {
+  flex: 1;
+  font-size: 14px;
+}
+
+.msg-time {
+  font-size: 11px;
+  color: #666;
+  min-width: 72px;
+  text-align: right;
+}
+
+.msg-user {
+  background: #e8f0ff;
+}
+
+.msg-agent {
+  background: #fff4e6;
+}
+
+.msg-system {
+  background: #f2f6f9;
+  font-style: italic;
+}
+
+.compose {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.compose input {
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #dbe7f5;
+}

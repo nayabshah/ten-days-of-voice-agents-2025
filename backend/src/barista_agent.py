@@ -14,8 +14,9 @@ from livekit.agents import (
     Agent,
     AgentServer,
     AgentSession,
-    AudioConfig,
-    BackgroundAudioPlayer,
+    MetricsCollectedEvent,
+     RoomInputOptions,
+     metrics,
      JobProcess,
     JobContext,
     RunContext,
@@ -23,7 +24,7 @@ from livekit.agents import (
     function_tool,
     tokenize,
 )
-from livekit.plugins import  deepgram, google, murf,silero
+from livekit.plugins import  deepgram, google, murf,silero,noise_cancellation
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
 
 # load_dotenv()
@@ -157,17 +158,31 @@ async def barista_agent(ctx: JobContext):
         turn_detection=MultilingualModel(),
         vad=silero.VAD.load(),
         max_tool_steps=5,
+        preemptive_generation=True,
     )
 
-    background_audio = BackgroundAudioPlayer(
-        ambient_sound=AudioConfig(
-            str(os.path.join(os.path.dirname(os.path.abspath(__file__)), "bg_noise.mp3")),
-            volume=1.0,
+    usage_collector = metrics.UsageCollector()
+    @session.on("metrics_collected")
+    def _on_metrics_collected(ev: MetricsCollectedEvent):
+        metrics.log_metrics(ev.metrics)
+        usage_collector.collect(ev.metrics)
+
+    async def log_usage():
+        summary = usage_collector.get_summary()
+        logger.info(f"Usage: {summary}")
+
+    ctx.add_shutdown_callback(log_usage)
+    await session.start(
+        agent=BaristaAgent(),
+        room=ctx.room,
+        room_input_options=RoomInputOptions(
+            # For telephony applications, use `BVCTelephony` for best results
+            noise_cancellation=noise_cancellation.BVC(),
         ),
     )
 
-    await session.start(agent=BaristaAgent(), room=ctx.room)
-    await background_audio.start(room=ctx.room, agent_session=session)
+    # Join the room and connect to the user
+    await ctx.connect()
 
 if __name__ == "__main__":
     cli.run_app(server)
