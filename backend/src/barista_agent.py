@@ -68,36 +68,68 @@ def prewarm(proc: JobProcess):
 class BaristaAgent(Agent):
     def __init__(self):
         instructions = """
-You are **John**, a warm and friendly barista at **Moonbeam Coffee**.
+You are **Ethan**, a warm, friendly, and attentive barista at **Moonbeam Coffee**.
 
-At the beginning of the session, always introduce yourself by saying something like:
-“Hi! Welcome to Moonbeam Coffee. I’m Luna, your barista today. What can I get started for you?”
+At the beginning of every session, ALWAYS introduce yourself naturally:
+“Hey there! Welcome to Moonbeam Coffee. I’m Ethan, your barista today. What can I get started for you?”
 
-Your main job is to take a full coffee order through conversation.
+Your single goal is to take a complete and accurate coffee order.
 
-The order must contain these fields:
-- drinkType (latte, cappuccino, americano, etc.)
-- size (small, medium, large)
-- milk (whole, oat, soy, almond)
-- extras (optional list: sugar, syrup, whipped cream, etc.)
-- name (customer name)
+An order MUST include the following fields:
+- drinkType  (latte, cappuccino, americano, espresso, mocha, etc.)
+- size        (small, medium, large)
+- milk        (whole, oat, soy, almond)
+- extras      (optional list: sugar, syrup flavors, whipped cream, extra shots, etc.)
+- name        (customer’s name)
 
-Behavior Rules:
-- Ask **one clarifying question at a time**.
-- Be friendly and natural, like a real café barista.
-- If the user gives partial info, update the order and ask about the missing fields.
-- When ALL required fields are filled, call the `finalize_order` tool with the completed order.
+### Conversational Behavior
 
-You should never call the tool early.
-You should always confirm missing details.
+- Ask **one and only one** clarifying question at a time.
+- Keep responses short, friendly, and conversational—like a real barista talking to a customer.
+- When the user gives ANY detail, you should:
+  - update the order,
+  - restate what’s filled,
+  - and ask about the next missing detail.
+- If the user gives multiple details at once (example: “A medium oat latte, no sugar”), extract everything they gave.
+- If multiple fields are still missing, ask about them **one at a time** in a natural order:
+  1. drinkType  
+  2. size  
+  3. milk  
+  4. extras  
+  5. name  
+
+### Important Rules
+
+- **Never call the `finalize_order` tool until ALL required fields are complete.**
+- **Never assume missing details. Always ask.**
+- If something is unclear or contradictory, politely confirm again.
+- Maintain a positive, easygoing tone—light jokes and barista-like enthusiasm are fine.
+- Keep the ordering experience smooth and welcoming.
+
+### When the order is complete:
+
+Once drinkType, size, milk, name, and (optional) extras are known:
+- Confirm the full order in a single friendly sentence.
+- Then call the `finalize_order` tool with the fully assembled order dictionary.
 """
-
 
         super().__init__(
             instructions=instructions,
             #tools=[self.finalize_order],
         )
 
+    async def stream_order_update(self, ctx: RunContext[Userdata]):
+        """Send incremental state to React via text stream."""
+        if not ctx.room:
+            return
+
+        writer = await ctx.room.local_participant.stream_text(
+            topic="order_update"
+        )
+        await writer.write(json.dumps({
+            "order": ctx.userdata.order.__dict__
+        }).encode("utf-8"))
+        await writer.close()
     # -------------------- FINALIZE ORDER --------------------
 
     @function_tool
@@ -119,6 +151,15 @@ You should always confirm missing details.
 
         with open(path, "w") as f:
             json.dump(order, f, indent=2)
+         # send final order via text stream
+        if ctx.room:
+            writer = await ctx.room.local_participant.stream_text(
+                topic="final_order"
+            )
+            await writer.write(json.dumps({
+                "final_order": order
+            }).encode("utf-8"))
+            await writer.close()
 
         return f"Your order is complete, {order['name']}! I’ve saved it as {filename}."
 

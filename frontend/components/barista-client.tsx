@@ -1,93 +1,171 @@
 'use client';
 
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { RoomEvent } from 'livekit-client';
-import { RoomAudioRenderer, RoomContext, StartAudio } from '@livekit/components-react';
-import { useSession } from '@/components/app/session-provider';
-import { BaristaUI } from './barista-ui';
-import ChatBox from './chat/chat-box';
+import React, { useEffect, useState } from 'react';
+import { Participant, RoomEvent } from 'livekit-client';
+import { Track } from 'livekit-client';
+import { Mic } from 'lucide-react';
+import { useRoomContext } from '@livekit/components-react';
+import { CoffeeCup } from './CoffeeCup';
+import { Receipt } from './Receipt';
+import { useSession } from './app/session-provider';
+import { AgentControlBar } from './livekit/agent-control-bar/agent-control-bar';
+import { INITIAL_ORDER_STATE, OrderState } from './types';
 
-interface Message {
-  id: number;
-  sender: 'user' | 'ai';
-  text: string;
-}
-// --------------------- BaristaClient Component ---------------------
-export default function BaristaClient(onDisconnect?: () => void) {
-  const room = useContext(RoomContext);
-  const [messages, setMessages] = useState<Message[]>([]);
+export default function BaristaClient() {
   const { isSessionActive, startSession, endSession } = useSession();
-  const msgIdRef = useRef(0);
+  const room = useRoomContext();
+
+  const [order, setOrder] = useState<OrderState>(INITIAL_ORDER_STATE);
+  const [finalOrder, setFinalOrder] = useState(null);
+
+  /* -------------------------------------------------------------------------- */
+  /*                        1. Handle AGENT → CLIENT updates                     */
+  /*                (via metadata & attributes — NO TEXT STREAMS)               */
+  /* -------------------------------------------------------------------------- */
 
   useEffect(() => {
     if (!room) return;
 
-    const onData = (payload: Uint8Array, participant?: any) => {
-      const text = new TextDecoder().decode(payload);
-      const sender = !participant || participant.identity.includes('agent') ? 'ai' : 'user';
-      setMessages((prev) => [...prev, { id: msgIdRef.current++, sender, text }]);
+    /** ATTRIBUTE CHANGES (partial updates) */
+    const handleAttrChange = (changed: Record<string, string>, participant: Participant) => {
+      if (participant.isLocal) return;
+
+      if (changed.order_update) {
+        try {
+          const partial = JSON.parse(changed.order_update);
+          setOrder((prev) => ({ ...prev, ...partial }));
+        } catch (err) {
+          console.error('Bad order_update attribute:', err);
+        }
+      }
+
+      if (changed.order_final) {
+        try {
+          const full = JSON.parse(changed.order_final);
+          setFinalOrder(full);
+          setOrder(full);
+        } catch (err) {
+          console.error('Bad order_final attribute:', err);
+        }
+      }
     };
 
-    room.on(RoomEvent.DataReceived, onData);
-    return () => room.off(RoomEvent.DataReceived, onData);
+    /** METADATA CHANGES (full state drops) */
+    const handleMetadataChange = (oldMeta: string | undefined, participant: Participant) => {
+      if (participant.isLocal) return;
+      if (!participant.metadata) return;
+
+      try {
+        const meta = JSON.parse(participant.metadata);
+
+        if (meta.partial) {
+          setOrder(meta.partial);
+        }
+
+        if (meta.final) {
+          setFinalOrder(meta.final);
+          setOrder(meta.final);
+        }
+      } catch (err) {
+        console.error('Bad metadata payload:', err);
+      }
+    };
+
+    room.on(RoomEvent.ParticipantAttributesChanged, handleAttrChange);
+    room.on(RoomEvent.ParticipantMetadataChanged, handleMetadataChange);
+
+    return () => {
+      room.off(RoomEvent.ParticipantAttributesChanged, handleAttrChange);
+      room.off(RoomEvent.ParticipantMetadataChanged, handleMetadataChange);
+    };
   }, [room]);
-  const handleSendMessage = (text: string) => {
-    if (!room) return;
-    // Send message to the room
-    room.localParticipant.publishData(new TextEncoder().encode(text));
-    setMessages((prev) => [...prev, { id: msgIdRef.current++, sender: 'user', text }]);
+
+  /* -------------------------------------------------------------------------- */
+  /*                                END SESSION                                 */
+  /* -------------------------------------------------------------------------- */
+
+  const handleEndSession = async () => {
+    try {
+      room?.localParticipant.setMicrophoneEnabled(false);
+    } catch (_) {}
+
+    endSession();
+    setOrder(INITIAL_ORDER_STATE);
+    setFinalOrder(null);
   };
 
-  const handleDisconnect = useCallback(async () => {
-    endSession();
-  }, [endSession]);
+  /* -------------------------------------------------------------------------- */
+  /*                                  UI (unchanged)                             */
+  /* -------------------------------------------------------------------------- */
+
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-[#0d0d0f] to-[#1a1a1d] p-6 text-gray-100">
+    <div className="flex h-screen flex-col bg-[#FDFBF7]">
       {/* Header */}
-      <div className="mb-6 text-center">
-        <h1 className="text-4xl font-extrabold text-amber-400 drop-shadow-md">
-          ☕ Moonbeam Coffee
-        </h1>
-        <p className="mt-1 text-gray-400">Your friendly AI Barista — ready to take your order.</p>
-      </div>
-
-      {/* Connect / Disconnect */}
-      <div className="mb-6 flex gap-4">
-        {!isSessionActive ? (
-          <button
-            onClick={startSession}
-            className="rounded-lg bg-amber-500 px-5 py-2 font-semibold text-black shadow-md transition hover:bg-amber-600"
-          >
-            🔊 Connect to Barista
-          </button>
-        ) : (
-          <button
-            onClick={handleDisconnect}
-            className="rounded-lg bg-red-600 px-5 py-2 font-semibold text-white shadow-md transition hover:bg-red-700"
-          >
-            🔇 Disconnect
-          </button>
-        )}
-      </div>
-
-      {/* Voice + Audio */}
-      {isSessionActive && (
-        <>
-          <StartAudio label="Start Microphone" />
-          <RoomAudioRenderer />
-        </>
-      )}
-
-      {/* Chat */}
-      {isSessionActive && room && (
-        <>
-          {' '}
-          <BaristaUI />
-          <div className="w-full max-w-xl">
-            <ChatBox messages={messages} onSend={handleSendMessage} />
+      <header className="flex items-center justify-between border-b border-gray-200 bg-white p-4 shadow-sm">
+        <div className="flex items-center gap-2 text-green-800">
+          <div className="rounded-lg bg-green-100 p-2">
+            <span className="text-xl font-black">GB</span>
           </div>
-        </>
-      )}
+          <h1 className="text-xl font-bold tracking-tight">GEMINI BARISTA</h1>
+        </div>
+        <div className="flex items-center gap-4">
+          <div
+            className={`flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium ${
+              isSessionActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+            }`}
+          >
+            <div
+              className={`h-2 w-2 rounded-full ${
+                isSessionActive ? 'animate-pulse bg-green-500' : 'bg-gray-400'
+              }`}
+            ></div>
+            {isSessionActive ? 'Live Agent Active' : 'Offline'}
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="flex flex-1 flex-col overflow-hidden md:flex-row">
+        <div className="relative flex flex-1 flex-col items-center justify-center overflow-hidden bg-[#F4EFEA] p-8">
+          <div className="relative z-10 scale-90 transform transition-transform duration-500 md:scale-100 lg:scale-110">
+            <CoffeeCup order={order} />
+          </div>
+        </div>
+
+        <div className="relative z-20 mx-auto flex w-full max-w-md flex-1 flex-col border-l border-gray-200 bg-white shadow-xl md:mx-0 md:w-auto">
+          <div className="flex flex-1 flex-col items-center justify-center overflow-y-auto bg-gray-50 p-6">
+            <Receipt order={order} />
+          </div>
+
+          <div className="border-t border-gray-100 bg-white p-6">
+            {isSessionActive && room ? (
+              <AgentControlBar
+                className="w-full"
+                controls={{
+                  leave: true,
+                  chat: true,
+                  camera: true,
+                  microphone: true,
+                  screenShare: true,
+                }}
+                onDisconnect={handleEndSession}
+              />
+            ) : (
+              <button
+                onClick={() => startSession()}
+                className="flex w-full items-center justify-center gap-3 rounded-xl bg-stone-900 py-4 text-lg font-bold text-white shadow-lg hover:bg-stone-800"
+              >
+                <Mic className="h-6 w-6" />
+                Start Conversation
+              </button>
+            )}
+
+            <p className="mt-4 text-center text-xs text-gray-400">
+              Microphone access required. Best experienced with headphones.
+            </p>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }
