@@ -13,7 +13,7 @@ from livekit.plugins import murf
 class QuizAgent(Agent):
     def __init__(self, ):
         super().__init__(
-            tts = murf.TTS(voice="Alicia"),
+            tts = murf.TTS(voice="Alicia",style="Conversation"),
             instructions = """
 You are **QuizAgent**.
 
@@ -89,8 +89,7 @@ Provide a fast, fun quiz experience while recording learning progress.
         )
     
     async def on_enter(self):
-        await self.say(
-            "You're now in Quiz Mode! What topic or skill would you like me to quiz you on?"
+        await self.session.generate_reply(instructions="You're now in Quiz Mode! What topic or skill would you like me to quiz you on?"
         )
 
     @function_tool()

@@ -10,7 +10,7 @@ class TeachBackAgent(Agent):
     def __init__(self, ):
         super().__init__(
             tts=murf.TTS(
-                voice="en-US-Ken", 
+                voice="en-US-Ken", style="Conversation"
             ),
             
             instructions = """
