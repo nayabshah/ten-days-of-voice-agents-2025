@@ -9,7 +9,10 @@ from livekit.plugins import murf
 class TeachBackAgent(Agent):
     def __init__(self, ):
         super().__init__(
-            tts = murf.TTS(voice="Ken"),
+            tts=murf.TTS(
+                voice="en-US-Ken", 
+            ),
+            
             instructions = """
 You are **TeachBackAgent**.
 
@@ -79,8 +82,8 @@ Strengthen understanding through teaching back while recording learning progress
            
         )
     async def on_enter(self):
-        await self.say("Great! Tell me the topic or skill you want to learn or explain.")
-        return await super().on_enter()
+        await self.session.generate_reply(instructions="Great! Tell me the topic or skill you want to learn or explain.")
+        
     
     @function_tool()
     async def save_topic_content(

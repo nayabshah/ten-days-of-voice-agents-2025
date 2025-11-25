@@ -1,0 +1,9 @@
+[
+  {
+    "id": "react_js",
+    "title": "React JS",
+    "summary": "React JS is a JavaScript library used for building interactive user interfaces by organizing them into reusable components. This component-based approach significantly improves the efficiency of managing and updating web applications.",
+    "sample_question": "In your own words, what is a key benefit of using React JS components?",
+    "accuracy": 100.0
+  }
+]

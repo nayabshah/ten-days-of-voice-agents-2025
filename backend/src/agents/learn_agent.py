@@ -13,7 +13,7 @@ class LearnAgent(Agent):
         
         
         super().__init__(
-            #tts = murf.TTS(voice="Matthew"),
+            tts = murf.TTS(voice="en-US-Matthew"),
             instructions="""
 You are LearnAgent.
 

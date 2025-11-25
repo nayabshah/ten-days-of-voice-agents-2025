@@ -50,5 +50,5 @@ Do not teach or quiz content yourself — your sole responsibility is to guide t
        return QuizAgent()
     @function_tool
     async def transfer_to_teach_back_agent(self) -> Agent:
-        return TeachBackAgent(ctx=context)
+        return TeachBackAgent()
 
