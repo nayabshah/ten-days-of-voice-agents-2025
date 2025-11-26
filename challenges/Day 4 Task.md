@@ -49,6 +49,7 @@ Keep this simple and focused: build a “Teach-the-Tutor” experience with thre
 - In each mode, the agent correctly uses the content file: explaining in learn, asking questions in quiz, and prompting the user to teach back in teach_back.
 
 #### Resources:
+
 - https://docs.livekit.io/agents/build/agents-handoffs/#tool-handoff
 - https://docs.livekit.io/agents/build/agents-handoffs/#context-preservation
 - https://github.com/livekit-examples/python-agents-examples/blob/main/complex-agents/medical_office_triage/triage.py
@@ -62,10 +63,12 @@ For participants who want to go beyond the basics, you can push the “active re
 Ideas (pick one or more):
 
 #### **1. Richer concept mastery model (backend)**
-  - Upgrade your `tutor` state to track scores and averages per concept, e.g.:
+
+- Upgrade your `tutor` state to track scores and averages per concept, e.g.:
 
 ```python
 session_state["tutor"]["mastery"]["loops"] = {
+  "topic":"variable",
     "times_explained": 3,
     "times_quizzed": 4,
     "times_taught_back": 2,
@@ -75,10 +78,12 @@ session_state["tutor"]["mastery"]["loops"] = {
 ```
 
 #### Resources:
+
 - Use a Database: https://www.geeksforgeeks.org/python/python-sqlite/
 
 #### **2. Teach-back evaluator tool**
-  - Implement a helper that the agent calls to _score_ explanations based on the concept summary:
+
+- Implement a helper that the agent calls to _score_ explanations based on the concept summary:
 
 ```python
 result = tools.evaluate_teach_back(
@@ -92,18 +97,21 @@ result = tools.evaluate_teach_back(
 - Let the user ask “Which concepts am I weakest at?” and answer from these scores.
 
 #### Resources:
+
 - Use a Database: https://www.geeksforgeeks.org/python/python-sqlite/
 
 #### **3. Richer content & flows**
-  - Add more concepts and lightweight “learning paths” (beginner → intermediate → advanced).
-  - Let the agent propose a practice plan based on the weakest concepts.
+
+- Add more concepts and lightweight “learning paths” (beginner → intermediate → advanced).
+- Let the agent propose a practice plan based on the weakest concepts.
 
 #### Resources:
+
 - Use a Document Database for content with tags: https://www.mongodb.com/
 
 These advanced pieces are for extra challenge and polish; **only the Primary Goal is required** for a Day 4 pass.
 
------
+---
 
 - Step 1: You only need the **primary goal** to complete Day 4; the **Advanced Goals** are for going the extra mile.
 - Step 2: **Successfully connect to the Teach-the-Tutor: Active Recall Coach** in your browser and use all the three learning modes (`learn`, `quiz` and `teach_back`)
