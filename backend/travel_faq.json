@@ -1,0 +1,24 @@
+{
+  "faq": [
+    {
+      "q": "packages",
+      "a": "We offer customizable travel packages including flights, hotels, sightseeing, and transfers."
+    },
+    {
+      "q": "price",
+      "a": "Prices depend on destination, dates, and hotel category. We can create a package that fits your budget."
+    },
+    {
+      "q": "visa",
+      "a": "Yes, we provide visa assistance for most countries."
+    },
+    {
+      "q": "refund",
+      "a": "Refunds depend on airline and hotel policies. We will guide you through the process."
+    },
+    {
+      "q": "flights",
+      "a": "We can book domestic and international flights at competitive rates."
+    }
+  ]
+}
