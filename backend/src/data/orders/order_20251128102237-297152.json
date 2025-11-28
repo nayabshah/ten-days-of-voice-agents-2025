@@ -1,0 +1,24 @@
+{
+  "orderId": "20251128102237-297152",
+  "timestamp": "2025-11-28T10:22:37.057857+00:00",
+  "items": [
+    {
+      "name": "Chocolate Bar",
+      "qty": 1,
+      "unit_price": 60,
+      "line_total": 60
+    },
+    {
+      "name": "Chicken Sandwich",
+      "qty": 1,
+      "unit_price": 85,
+      "line_total": 85
+    }
+  ],
+  "total": 145,
+  "status": "Preparing",
+  "customer": {
+    "name": "Alice",
+    "address": "twelfth Street, LA"
+  }
+}

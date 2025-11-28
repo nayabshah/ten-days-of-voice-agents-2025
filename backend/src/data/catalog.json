@@ -1,0 +1,135 @@
+{
+  "items": [
+    {
+      "name": "Whole Wheat Bread",
+      "category": "Groceries",
+      "price": 45,
+      "brand": "Harvest Gold",
+      "tags": [
+        "bread",
+        "vegan"
+      ]
+    },
+    {
+      "name": "White Bread",
+      "category": "Groceries",
+      "price": 40,
+      "brand": "Britannia",
+      "tags": [
+        "bread"
+      ]
+    },
+    {
+      "name": "Eggs - 12 Pack",
+      "category": "Groceries",
+      "price": 75,
+      "tags": [
+        "protein",
+        "breakfast"
+      ]
+    },
+    {
+      "name": "Milk - 1L",
+      "category": "Groceries",
+      "price": 62,
+      "brand": "Amul",
+      "tags": [
+        "dairy"
+      ]
+    },
+    {
+      "name": "Peanut Butter - 500g",
+      "category": "Groceries",
+      "price": 199,
+      "brand": "Pintola",
+      "tags": [
+        "vegan",
+        "spread"
+      ]
+    },
+    {
+      "name": "Pasta - 500g",
+      "category": "Groceries",
+      "price": 120,
+      "brand": "Barilla",
+      "tags": [
+        "pasta"
+      ]
+    },
+    {
+      "name": "Tomato Pasta Sauce",
+      "category": "Groceries",
+      "price": 149,
+      "brand": "Del Monte",
+      "tags": [
+        "sauce"
+      ]
+    },
+    {
+      "name": "Onion - 1kg",
+      "category": "Groceries",
+      "price": 40,
+      "tags": [
+        "vegetable"
+      ]
+    },
+    {
+      "name": "Tomato - 1kg",
+      "category": "Groceries",
+      "price": 50,
+      "tags": [
+        "vegetable"
+      ]
+    },
+    {
+      "name": "Bananas - 6 pcs",
+      "category": "Groceries",
+      "price": 45,
+      "tags": [
+        "fruit"
+      ]
+    },
+    {
+      "name": "Potato Chips",
+      "category": "Snacks",
+      "price": 35,
+      "brand": "Lays"
+    },
+    {
+      "name": "Chocolate Bar",
+      "category": "Snacks",
+      "price": 60,
+      "brand": "Cadbury"
+    },
+    {
+      "name": "Veg Sandwich",
+      "category": "Prepared Food",
+      "price": 70
+    },
+    {
+      "name": "Chicken Sandwich",
+      "category": "Prepared Food",
+      "price": 85
+    },
+    {
+      "name": "Margherita Pizza",
+      "category": "Prepared Food",
+      "price": 199
+    },
+    {
+      "name": "Cold Coffee",
+      "category": "Drinks",
+      "price": 99
+    },
+    {
+      "name": "Apple Juice",
+      "category": "Drinks",
+      "price": 120
+    },
+    {
+      "name": "Noodles - 2 Pack",
+      "category": "Snacks",
+      "price": 30
+    }
+  ]
+}
