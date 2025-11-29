@@ -1,0 +1,30 @@
+[
+  {
+    "userName": "John",
+    "securityIdentifier": "JD-1001",
+    "caseStatus": "pending_review",
+    "transactionTime": "2025-11-25T14:12:00Z",
+
+    "transactionName": "ABC Industry",
+    "transactionCategory": "e-commerce",
+    "transactionSource": "abc-industry.example.com"
+  },
+  {
+    "userName": "Alina",
+    "securityIdentifier": "JD-1002",
+    "caseStatus": "pending_review",
+    "transactionTime": "2025-11-26T09:05:00Z",
+    "transactionName": "XYZ Industry",
+    "transactionCategory": "food",
+    "transactionSource": "quickshop.example.com"
+  },
+  {
+    "userName": "Alice",
+    "securityIdentifier": "AS-2001",
+    "caseStatus": "pending_review",
+    "transactionTime": "2025-11-24T22:33:00Z",
+    "transactionName": "Gadgets Galore",
+    "transactionCategory": "electronics",
+    "transactionSource": "gadgets.example.com"
+  }
+]
